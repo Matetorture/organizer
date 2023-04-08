@@ -58,8 +58,14 @@ while ($row = $res->fetch_assoc()){
 
 mysqli_free_result($res);
 mysqli_close($conn);
+
+echo '<meta name="owner" content="'.$_SESSION['owner'].'">';
+echo '<meta name="edit" content="'.$_SESSION['edit'].'">';
+echo '<meta name="addusers" content="'.$_SESSION['add_users'].'">';
+echo '<meta name="kickusers" content="'.$_SESSION['kick_users'].'">';
+
 ?>
-<div id="c">
+<div id="content">
     <canvas id="board"></canvas>
-    <div id="elements-list"></div>
+    <div id="left-panel"></div>
 </div>

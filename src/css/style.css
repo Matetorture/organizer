@@ -6,16 +6,18 @@ body{
     /* margin: 0; */
 }
 #board{
-    width: 80%;
-    height: auto;
-    /* height: 800px;
-    width: 1620px; */
+    width: 80vw;
+    height: 85vh;
 }
-#c{
+#content{
     display: flex;
 }
-#elements-list{
+#left-panel{
     width: 20%;
+}
+#elements-list{
+    overflow-y: scroll;
+    height: 80vh;
 }
 #elements-list li{
     padding-top: 15px;

@@ -1,10 +1,6 @@
 $(document).ready(function() {
 
     let isBoardOpen = document.querySelector('meta[name="isBoardOpen"]').content;
-
-    $('#list').click(function(){
-        $('#app').load('board_list.php');
-    });
     
     if(!isBoardOpen){
         $('#app').load('board_list.php');
@@ -20,6 +16,17 @@ $(document).ready(function() {
 
             board.ctx.canvas.height = board.height;
             board.ctx.canvas.width = board.width;
+
+            window.addEventListener('resize', () => {
+                board.width = board.ref.offsetWidth;
+                board.height = board.ref.offsetHeight;
+
+                board.ctx.canvas.height = board.height;
+                board.ctx.canvas.width = board.width;
+                
+                drawBoard(false);
+            });
+              
 
             class Element {
                 constructor(id, text, bgColor, textColor, x, y, categoryId){
@@ -72,23 +79,14 @@ $(document).ready(function() {
                 );
             }
 
-            function updateInDB(){
-                $('#update').load('handlers/update.php', { 
-                    elements: elements,
-                    categories: categories
-                }, 
-                function(){
-                    console.log('saved');
-                });
-            }
+            const permissions = {
+                owner:  Boolean(document.querySelector(`meta[name="owner"]`).content),
+                edit:  Boolean(document.querySelector(`meta[name="edit"]`).content),
+                add:  Boolean(document.querySelector(`meta[name="addusers"]`).content),
+                kick:  Boolean(document.querySelector(`meta[name="kickusers"]`).content)
+            };
 
-            let selectedElement = null;
-            let mouseX;
-            let mouseY;
-            let deltaX;
-            let deltaY;
-
-            function drawBoard(){
+            function drawBoard(save = true, editable = true){
 
                 board.ctx.clearRect(0, 0, board.ref.width, board.ref.height);
 
@@ -115,116 +113,25 @@ $(document).ready(function() {
                     board.ctx.font = "24px 'Share Tech Mono', monospace";
                     board.ctx.fillText(e.text, parseFloat(e.x)+e.width/2, parseFloat(e.y)+e.height/2+13/2);
                 });
-
-                updateInDB();
-                drawElementsList();
-            }
-
-            function handleMouseDown(event) {
-                mouseX = event.clientX - board.ref.offsetLeft;
-                mouseY = event.clientY - board.ref.offsetTop;
-
-                elements.forEach(function(e) {
-                    if (mouseX > e.x && mouseX < e.x + e.width && mouseY > e.y && mouseY < e.y + e.height) {
-                        selectedElement = e;
-                        deltaX = mouseX - selectedElement.x;
-                        deltaY = mouseY - selectedElement.y;
-                    }
-                });
-            }
-            function handleMouseMove(event) {
-                if (selectedElement !== null) {
-                    let newMouseX = event.clientX - board.ref.offsetLeft;
-                    let newMouseY = event.clientY - board.ref.offsetTop;
-                    
-                    selectedElement.x = newMouseX - deltaX;
-                    selectedElement.y = newMouseY - deltaY;
-
-                    drawBoard();
+                if(save){
+                    updateInDB();
                 }
-            }
-            function handleMouseUp() { selectedElement = null; }
-
-            function handleClick(event) {
-                const rect = board.ref.getBoundingClientRect();
-                x = event.clientX - rect.left;
-                y = event.clientY - rect.top;
-
-                for (let i = 0; i < elements.length; i++) {
-                    const e = elements[i];
-                
-                    if (x >= e.x && x <= e.x + e.width && y >= e.y && y <= e.y + e.height) {
-                    const textInput = document.createElement('input');
-                    textInput.id = `textS`;
-                    textInput.value = e.text;
-                    
-                    e.width = (13*e.text.length)+40;
-                    e.height = 70;
-
-                    board.ctx.fillStyle = `#${e.bgColor}`;
-                    board.ctx.beginPath();
-                    board.ctx.rect(e.x, e.y, e.width, e.height);
-                    board.ctx.fill();
-
-                    
-
-                    textInput.type = 'text';
-                    textInput.style.position = 'absolute';
-                    textInput.style.left = board.ref.offsetLeft + e.x + 15 + 'px';
-                    textInput.style.top = board.ref.offsetTop + e.y + 15 + 'px';
-                    textInput.style.width = e.width - 30 + 'px';
-                    textInput.style.height = e.height - 30 + 'px';
-                    textInput.style.border = 'none';
-                    textInput.style.padding = '0';
-                    textInput.style.margin = '0';
-                    textInput.style.color = '#ffffff'
-                    textInput.style.fontSize = '24px';
-                    textInput.style.fontFamily = "'Share Tech Mono', monospace";
-                    textInput.style.backgroundColor = 'transparent';
-
-                    board.ref.parentNode.appendChild(textInput);
-                    textInput.focus();
-                
-                    textInput.addEventListener('input', () => {
-                        e.text = textInput.value;
-                        
-                        e.width = (13*e.text.length)+40;
-                        e.height = 70;
-
-                        textInput.style.width = e.width - 30 + 'px';
-                        textInput.style.height = e.height - 30 + 'px';
-
-                        drawBoard();
-                        board.ctx.fillStyle = `#${e.bgColor}`;
-                        board.ctx.beginPath();
-                        board.ctx.rect(e.x, e.y, e.width, e.height);
-                        board.ctx.fill();
-                    });
-
-                    textInput.addEventListener('blur', () => {
-                        e.text = textInput.value;
-                        board.ref.parentNode.removeChild(textInput);
-                        drawBoard();
-                    });
-                
-                    break;
-                    }
-                }
+                drawElementsList(editable);
             }
 
-            function drawElementsList(){
+            function drawElementsList(editable = true){
 
-                const list = document.querySelector('#elements-list');
+                const list = document.querySelector('#left-panel');
                 let returnList = "";
 
-                returnList += '<form action="handlers/category/add.php" method="get"><button id="addCategory" type="submit">Add Category</button></form>';
+                returnList += '<form action="handlers/category/add.php" method="get"><button id="addCategory" type="submit">Add Category</button></form><div id="elements-list">';
 
                 returnList += `<ul>`;
                 categories.forEach((e) => {
                     returnList += `<li class="li-categories" id="li-category${e.id}"><span id="ctext${e.id}">${e.name}</span><span class="attributes"><input type="color" name="cColor${e.id}" id="cColor${e.id}" value="#${e.color}"><form action="handlers/category/delete.php" method="get"><button class="deleteCategory" name="id" value="${e.id}" type="submit">D</button></form></span><ul>`;
                     elements.forEach((el) => {
                         if(e.id == el.categoryId){
-                            returnList += `<li class="li-elements" draggable="true" id="li-element${el.id}"><span id="etext${el.id}">${el.text}</span><span class="attributes"><input type="color" name="bgColor${el.id}" id="bgColor${el.id}" value="#${el.bgColor}"><input type="color" name="textColor${el.id}" id="textColor${el.id}" value="#${el.textColor}"><form action="handlers/element/delete.php" method="get"><button class="deleteElement" name="id" value="${el.id}" type="submit">D</button></form></span></li>`;
+                            returnList += `<li class="li-elements" draggable="true" id="li-element${el.id}"><span id="etext${el.id}">${el.text}</span><span class="attributes"><span id="ex${el.id}">${el.x}</span> <span id="ey${el.id}">${el.y}</span> <input type="color" name="bgColor${el.id}" id="bgColor${el.id}" value="#${el.bgColor}"><input type="color" name="textColor${el.id}" id="textColor${el.id}" value="#${el.textColor}"><form action="handlers/element/delete.php" method="get"><button class="deleteElement" name="id" value="${el.id}" type="submit">D</button></form></span></li>`;
                         }
                     });
 
@@ -232,97 +139,246 @@ $(document).ready(function() {
 
                     returnList += `</ul></li>`;
                 });
-                returnList += `</ul>`;
+                returnList += `</ul></div>`;
                 list.innerHTML = returnList;
 
-                categories.forEach((e) => {
-                    const cColor = document.querySelector(`#cColor${e.id}`);
-                    cColor.addEventListener('input', () => {
-                        e.color = cColor.value.slice(1);
-                        drawBoard();
-                    });
-
-                    const cText = document.querySelector(`#ctext${e.id}`);
-                    cText.addEventListener('click', () => {
-                        const cTextInput = document.createElement('input');
-                        cTextInput.type = 'text';
-                        cTextInput.value = e.name;
-                        cTextInput.style.width = `${(7*e.name.length)+4}px`;
-
-                        cText.replaceWith(cTextInput);
-                        cTextInput.focus();
-
-                        cTextInput.addEventListener('blur', () => {
-                            cText.innerText = cTextInput.value;
-                            cTextInput.replaceWith(cText);
-                            e.name = cTextInput.value;
+                if(editable){
+                    categories.forEach((e) => {
+                        const cColor = document.querySelector(`#cColor${e.id}`);
+                        cColor.addEventListener('input', () => {
+                            e.color = cColor.value.slice(1);
                             drawBoard();
                         });
-                    });
-
-
-                    elements.forEach((el) => {
-                        if(e.id == el.categoryId){
-                            const bgColor = document.querySelector(`#bgColor${el.id}`);
-                            bgColor.addEventListener('input', () => {
-                                el.bgColor = bgColor.value.slice(1);
+    
+                        const cText = document.querySelector(`#ctext${e.id}`);
+                        cText.addEventListener('click', () => {
+                            const cTextInput = document.createElement('input');
+                            cTextInput.type = 'text';
+                            cTextInput.value = e.name;
+                            cTextInput.style.width = `${(7*e.name.length)+2}px`;
+    
+                            cText.replaceWith(cTextInput);
+                            cTextInput.focus();
+    
+                            cTextInput.addEventListener('blur', () => {
+                                cText.innerText = cTextInput.value;
+                                cTextInput.replaceWith(cText);
+                                e.name = cTextInput.value;
                                 drawBoard();
                             });
-
-                            const textColor = document.querySelector(`#textColor${el.id}`);
-                            textColor.addEventListener('input', () => {
-                                el.textColor = textColor.value.slice(1);
-                                drawBoard();
-                            });
-
-                            const eText = document.querySelector(`#etext${el.id}`);
-                            eText.addEventListener('click', () => {
-                                const eTextInput = document.createElement('input');
-                                eTextInput.type = 'text';
-                                eTextInput.value = el.text;
-                                eTextInput.style.width = `${(7*e.name.length)+4}px`;
-                                eText.replaceWith(eTextInput);
-                                eTextInput.focus();
-
-                                eTextInput.addEventListener('blur', () => {
-                                    eText.innerText = eTextInput.value;
-                                    eTextInput.replaceWith(eText);
-                                    el.text = eTextInput.value;
+                        });
+    
+    
+                        elements.forEach((el) => {
+                            if(e.id == el.categoryId){
+                                const bgColor = document.querySelector(`#bgColor${el.id}`);
+                                bgColor.addEventListener('input', () => {
+                                    el.bgColor = bgColor.value.slice(1);
                                     drawBoard();
                                 });
-                            });
-                        }
+    
+                                const textColor = document.querySelector(`#textColor${el.id}`);
+                                textColor.addEventListener('input', () => {
+                                    el.textColor = textColor.value.slice(1);
+                                    drawBoard();
+                                });
+    
+                                const eText = document.querySelector(`#etext${el.id}`);
+                                eText.addEventListener('click', () => {
+                                    const eTextInput = document.createElement('input');
+                                    eTextInput.type = 'text';
+                                    eTextInput.value = el.text;
+                                    eTextInput.style.width = `${(7*el.text.length)+4}px`;
+                                    eText.replaceWith(eTextInput);
+                                    eTextInput.focus();
+    
+                                    eTextInput.addEventListener('blur', () => {
+                                        eText.innerText = eTextInput.value;
+                                        eTextInput.replaceWith(eText);
+                                        el.text = eTextInput.value;
+                                        drawBoard();
+                                    });
+                                });
+    
+                                const eX = document.querySelector(`#ex${el.id}`);
+                                eX.addEventListener('click', () => {
+                                    const eXInput = document.createElement('input');
+                                    eXInput.type = 'text';
+                                    eXInput.value = el.x;
+                                    eXInput.style.width = `${ 8*String(el.x).length }px`;
+                                    eX.replaceWith(eXInput);
+                                    eXInput.focus();
+    
+                                    eXInput.addEventListener('blur', () => {
+                                        eX.innerText = eXInput.value;
+                                        eXInput.replaceWith(eX);
+                                        el.x = parseInt(eXInput.value);
+                                        drawBoard();
+                                    });
+                                });
+    
+                                const eY = document.querySelector(`#ey${el.id}`);
+                                eY.addEventListener('click', () => {
+                                    const eYInput = document.createElement('input');
+                                    eYInput.type = 'text';
+                                    eYInput.value = el.y;
+                                    eYInput.style.width = `${ 8*String(el.y).length}px`;
+                                    eY.replaceWith(eYInput);
+                                    eYInput.focus();
+    
+                                    eYInput.addEventListener('blur', () => {
+                                        eY.innerText = eYInput.value;
+                                        eYInput.replaceWith(eY);
+                                        el.y = parseInt(eYInput.value);
+                                        drawBoard();
+                                    });
+                                });
+                            }
+                        });
+    
                     });
-
-                });
-
-                var draggedElement;
-
-                document.querySelectorAll('.li-elements').forEach(li => {
-                    li.addEventListener('dragstart', (ev) => {
-                        draggedElement = ev.target;
+    
+                    var draggedElement;
+    
+                    document.querySelectorAll('.li-elements').forEach(li => {
+                        li.addEventListener('dragstart', (ev) => {
+                            draggedElement = ev.target;
+                        });
                     });
-                });
-
-                document.querySelectorAll('.li-categories').forEach(li => {
-                    li.addEventListener('drop', (ev) => {
-                        ev.preventDefault();
-                        var targetElement = ev.target.closest('.li-categories');
-                        elements.find((el) => { return el.id == draggedElement.id.slice(10); }).categoryId = parseInt(targetElement.id.slice(11));
-                        drawBoard();
+    
+                    document.querySelectorAll('.li-categories').forEach(li => {
+                        li.addEventListener('drop', (ev) => {
+                            ev.preventDefault();
+                            var targetElement = ev.target.closest('.li-categories');
+                            elements.find((el) => { return el.id == draggedElement.id.slice(10); }).categoryId = parseInt(targetElement.id.slice(11));
+                            drawBoard();
+                        });
+                        li.addEventListener('dragover', (ev) => {
+                            ev.preventDefault();
+                        });
                     });
-                    li.addEventListener('dragover', (ev) => {
-                        ev.preventDefault();
-                    });
-                });
+                }
             }
 
-            board.ref.addEventListener('mousedown', handleMouseDown);
-            board.ref.addEventListener('mousemove', handleMouseMove);
-            board.ref.addEventListener('mouseup', handleMouseUp);
-            board.ref.addEventListener('click', handleClick);
-
-            drawBoard();
+            if(!permissions.edit){
+                drawBoard(false, false);
+            }
+            else{
+                function updateInDB(){
+                    $('#update').load('handlers/update.php', { 
+                        elements: elements,
+                        categories: categories
+                    }, 
+                    function(){
+                        console.log('saved');
+                    });
+                }
+    
+                let selectedElement = null;
+                let mouseX;
+                let mouseY;
+                let deltaX;
+                let deltaY;
+    
+                function handleMouseDown(event) {
+                    mouseX = event.clientX - board.ref.offsetLeft;
+                    mouseY = event.clientY - board.ref.offsetTop;
+    
+                    elements.forEach(function(e) {
+                        if (mouseX > e.x && mouseX < e.x + e.width && mouseY > e.y && mouseY < e.y + e.height) {
+                            selectedElement = e;
+                            deltaX = mouseX - selectedElement.x;
+                            deltaY = mouseY - selectedElement.y;
+                        }
+                    });
+                }
+                function handleMouseMove(event) {
+                    if (selectedElement !== null) {
+                        let newMouseX = event.clientX - board.ref.offsetLeft;
+                        let newMouseY = event.clientY - board.ref.offsetTop;
+                        
+                        selectedElement.x = newMouseX - deltaX;
+                        selectedElement.y = newMouseY - deltaY;
+    
+                        drawBoard(false);
+                    }
+                }
+                function handleMouseUp() { selectedElement = null; drawBoard(); }
+    
+                function handleClick(event) {
+                    const rect = board.ref.getBoundingClientRect();
+                    x = event.clientX - rect.left;
+                    y = event.clientY - rect.top;
+    
+                    for (let i = 0; i < elements.length; i++) {
+                        const e = elements[i];
+                    
+                        if (x >= e.x && x <= e.x + e.width && y >= e.y && y <= e.y + e.height) {
+                        const textInput = document.createElement('input');
+                        textInput.id = `textS`;
+                        textInput.value = e.text;
+                        
+                        e.width = (13*e.text.length)+40;
+                        e.height = 70;
+    
+                        board.ctx.fillStyle = `#${e.bgColor}`;
+                        board.ctx.beginPath();
+                        board.ctx.rect(e.x, e.y, e.width, e.height);
+                        board.ctx.fill();
+    
+                        
+    
+                        textInput.type = 'text';
+                        textInput.style.position = 'absolute';
+                        textInput.style.left = board.ref.offsetLeft + e.x + 15 + 'px';
+                        textInput.style.top = board.ref.offsetTop + e.y + 15 + 'px';
+                        textInput.style.width = e.width - 30 + 'px';
+                        textInput.style.height = e.height - 30 + 'px';
+                        textInput.style.border = 'none';
+                        textInput.style.padding = '0';
+                        textInput.style.margin = '0';
+                        textInput.style.color = '#ffffff'
+                        textInput.style.fontSize = '24px';
+                        textInput.style.fontFamily = "'Share Tech Mono', monospace";
+                        textInput.style.backgroundColor = 'transparent';
+    
+                        board.ref.parentNode.appendChild(textInput);
+                        textInput.focus();
+                    
+                        textInput.addEventListener('input', () => {
+                            e.text = textInput.value;
+                            
+                            e.width = (13*e.text.length)+40;
+                            e.height = 70;
+    
+                            textInput.style.width = e.width - 30 + 'px';
+                            textInput.style.height = e.height - 30 + 'px';
+    
+                            drawBoard(false);
+                            board.ctx.fillStyle = `#${e.bgColor}`;
+                            board.ctx.beginPath();
+                            board.ctx.rect(e.x, e.y, e.width, e.height);
+                            board.ctx.fill();
+                        });
+    
+                        textInput.addEventListener('blur', () => {
+                            e.text = textInput.value;
+                            board.ref.parentNode.removeChild(textInput);
+                            drawBoard();
+                        });
+                    
+                        break;
+                        }
+                    }
+                }
+    
+                board.ref.addEventListener('mousedown', handleMouseDown);
+                board.ref.addEventListener('mousemove', handleMouseMove);
+                board.ref.addEventListener('mouseup', handleMouseUp);
+                board.ref.addEventListener('click', handleClick);
+    
+                drawBoard(false);
+            }
         });
     }
 });

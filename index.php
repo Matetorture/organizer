@@ -12,7 +12,7 @@ if(isset($_GET["board"])){
 
         include 'src/cfg/conn.php';
 
-        $sql = "SELECT userboard.id_user FROM userboard WHERE userboard.id_board='".$_GET["board"]."'";
+        $sql = "SELECT userboard.id_user, userboard.owner, userboard.edit, userboard.add_users, userboard.kick_users FROM userboard WHERE userboard.id_board='".$_GET["board"]."'";
 
         $res = @mysqli_query($conn, $sql);
 
@@ -22,6 +22,10 @@ if(isset($_GET["board"])){
             $row = $res->fetch_assoc(); 
             if($_SESSION['id_user'] == $row['id_user']){
                 $_SESSION['board'] = $_GET["board"];
+                $_SESSION['owner'] = $row['owner'];
+                $_SESSION['edit'] = $row['edit'];
+                $_SESSION['add_users'] = $row['add_users'];
+                $_SESSION['kick_users'] = $row['kick_users'];
                 $isBoardOpen = true;
             }
         }
@@ -47,7 +51,7 @@ if(isset($_GET["board"])){
     <script src="src/js/app.js"></script>
 </head>
 <body>
-    <button id="list">list</button>
+    <a href="index.php" id="list">list</a>
     <div id="main">
         <div id="app"></div>
         <div id="update"></div>

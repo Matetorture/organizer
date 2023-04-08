@@ -7,7 +7,7 @@ if(!isset($_SESSION["name"])){
 
 include 'src/cfg/conn.php';
 
-$sql = "SELECT board.id_board, board.name, board.date, userboard.id_permission FROM board, userboard WHERE userboard.id_board = board.id_board and userboard.id_user='".$_SESSION['id_user']."'";
+$sql = "SELECT board.id_board, board.name, board.date FROM board, userboard WHERE userboard.id_board = board.id_board and userboard.id_user='".$_SESSION['id_user']."'";
 
 $res = @mysqli_query($conn, $sql);
 
