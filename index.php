@@ -43,9 +43,8 @@ if(isset($_GET["board"])){
 
     <link rel="stylesheet" href="src/css/style.css">
 
-    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-    <script src="src/s.js"></script>
+    <script src="src/js/app.js"></script>
 </head>
 <body>
     <button id="list">list</button>
@@ -57,8 +56,5 @@ if(isset($_GET["board"])){
     <form action="login/login_handler.php" method="post">
         <input type="submit" value="logout" name="logout">
     </form>
-
-    <!-- <script src="src/js/app.js"></script> -->
-    <!-- <script src="src/s.js"></script> -->
 </body>
 </html>

@@ -2,10 +2,10 @@
 
 session_start();
 if(!isset($_SESSION["name"])){
-    header('Location: login/index.php');
+    header('Location: ../login/index.php');
 }
-if(!isset($_POST["elements"])){
-    header('Location: login/index.php');
+if(!isset($_POST["elements"]) || !isset($_POST["categories"])){
+    header('Location: ../login/index.php');
 }
 
 include 'src/cfg/conn.php';
