@@ -23,8 +23,8 @@ $(document).ready(function() {
 
                 board.ctx.canvas.height = board.height;
                 board.ctx.canvas.width = board.width;
-                
-                drawBoard(false);
+
+                drawBoard(false, permissions.edit, permissions.editU);
             });
               
 
@@ -80,13 +80,14 @@ $(document).ready(function() {
             }
 
             const permissions = {
-                owner:  Boolean(document.querySelector(`meta[name="owner"]`).content),
-                edit:  Boolean(document.querySelector(`meta[name="edit"]`).content),
-                add:  Boolean(document.querySelector(`meta[name="addusers"]`).content),
-                kick:  Boolean(document.querySelector(`meta[name="kickusers"]`).content)
+                owner:  document.querySelector(`meta[name="owner"]`).content == 1 ? true : false,
+                edit:  document.querySelector(`meta[name="edit"]`).content == 1 ? true : false,
+                add:  document.querySelector(`meta[name="addusers"]`).content == 1 ? true : false,
+                editU: document.querySelector(`meta[name="editusers"]`).content == 1 ? true : false,
+                kick:  document.querySelector(`meta[name="kickusers"]`).content == 1 ? true : false
             };
 
-            function drawBoard(save = true, editable = true){
+            function drawBoard(save = true, editable = true, admin = true, list = true){
 
                 board.ctx.clearRect(0, 0, board.ref.width, board.ref.height);
 
@@ -116,15 +117,21 @@ $(document).ready(function() {
                 if(save){
                     updateInDB();
                 }
-                drawElementsList(editable);
+                if(list){
+                    drawElementsList(editable, admin);
+                }
             }
 
-            function drawElementsList(editable = true){
+            function drawElementsList(editable = true, admin = true){
 
                 const list = document.querySelector('#left-panel');
                 let returnList = "";
 
-                returnList += '<form action="handlers/category/add.php" method="get"><button id="addCategory" type="submit">Add Category</button></form><div id="elements-list">';
+                returnList += '<form action="handlers/category/add.php" method="get"><button id="addCategory" type="submit">Add Category</button></form>';
+                if(admin){
+                    returnList += '<button id="showUsers">users</button>';
+                }
+                returnList += '<div id="elements-list">';
 
                 returnList += `<ul>`;
                 categories.forEach((e) => {
@@ -142,12 +149,68 @@ $(document).ready(function() {
                 returnList += `</ul></div>`;
                 list.innerHTML = returnList;
 
+                if(admin){
+                    const userList = document.querySelectorAll('#users-list-list li span:last-child');
+
+                    userList.forEach((e) => {
+                        class User {
+                            constructor(id, edit, addUsers, editUsers, kickUsers){
+                                this.id = id;
+                                this.edit = edit;
+                                this.addUsers = addUsers;
+                                this.editUsers = editUsers;
+                                this.kickUsers = kickUsers;
+                            }
+                        }
+
+                        const inputs = e.querySelectorAll('input');
+                        let users =
+                            new User(
+                                parseInt(inputs[0].name.slice(4)),
+                                inputs[0].checked ? 1 : 0,
+                                inputs[1].checked ? 1 : 0,
+                                inputs[2].checked ? 1 : 0,
+                                inputs[3].checked ? 1 : 0
+                            )
+                        
+
+                        inputs.forEach((el) => {
+                            el.addEventListener('input', () => {
+                                users.edit = inputs[0].checked ? 1 : 0;
+                                users.addUsers = inputs[1].checked ? 1 : 0;
+                                users.editUsers = inputs[2].checked ? 1 : 0;
+                                users.kickUsers = inputs[3].checked ? 1 : 0;
+
+                                $('#update').load('handlers/update_users.php', { 
+                                    users: users
+                                }, 
+                                function(){
+                                    console.log('saved users');
+                                });
+                            });
+                        });
+                    });
+
+                    document.querySelector('#showUsers').addEventListener('click', () => {
+                        document.querySelector('#users-list').style.display = "block";
+                        document.querySelector('#users-list-bg').style.display = "block";
+                    });
+                    document.querySelector('#close-user-list').addEventListener('click', () => {
+                        document.querySelector('#users-list').style.display = "none";
+                        document.querySelector('#users-list-bg').style.display = "none";
+                    });
+                    document.querySelector('#users-list-bg').addEventListener('click', () => {
+                        document.querySelector('#users-list').style.display = "none";
+                        document.querySelector('#users-list-bg').style.display = "none";
+                    });
+                }
+
                 if(editable){
                     categories.forEach((e) => {
                         const cColor = document.querySelector(`#cColor${e.id}`);
                         cColor.addEventListener('input', () => {
                             e.color = cColor.value.slice(1);
-                            drawBoard();
+                            drawBoard(false, permissions.edit, permissions.editU, false);
                         });
     
                         const cText = document.querySelector(`#ctext${e.id}`);
@@ -164,7 +227,7 @@ $(document).ready(function() {
                                 cText.innerText = cTextInput.value;
                                 cTextInput.replaceWith(cText);
                                 e.name = cTextInput.value;
-                                drawBoard();
+                                drawBoard(true, permissions.edit, permissions.editU);
                             });
                         });
     
@@ -174,13 +237,13 @@ $(document).ready(function() {
                                 const bgColor = document.querySelector(`#bgColor${el.id}`);
                                 bgColor.addEventListener('input', () => {
                                     el.bgColor = bgColor.value.slice(1);
-                                    drawBoard();
+                                    drawBoard(false, permissions.edit, permissions.editU, false);
                                 });
     
                                 const textColor = document.querySelector(`#textColor${el.id}`);
                                 textColor.addEventListener('input', () => {
                                     el.textColor = textColor.value.slice(1);
-                                    drawBoard();
+                                    drawBoard(false, permissions.edit, permissions.editU, false);
                                 });
     
                                 const eText = document.querySelector(`#etext${el.id}`);
@@ -191,12 +254,17 @@ $(document).ready(function() {
                                     eTextInput.style.width = `${(7*el.text.length)+4}px`;
                                     eText.replaceWith(eTextInput);
                                     eTextInput.focus();
+
+                                    eTextInput.addEventListener('input', () => {
+                                        el.text = eTextInput.value;
+                                        drawBoard(false, permissions.edit, permissions.editU, false);
+                                    });
     
                                     eTextInput.addEventListener('blur', () => {
                                         eText.innerText = eTextInput.value;
                                         eTextInput.replaceWith(eText);
                                         el.text = eTextInput.value;
-                                        drawBoard();
+                                        drawBoard(true, permissions.edit, permissions.editU);
                                     });
                                 });
     
@@ -213,7 +281,7 @@ $(document).ready(function() {
                                         eX.innerText = eXInput.value;
                                         eXInput.replaceWith(eX);
                                         el.x = parseInt(eXInput.value);
-                                        drawBoard();
+                                        drawBoard(true, permissions.edit, permissions.editU);
                                     });
                                 });
     
@@ -230,7 +298,7 @@ $(document).ready(function() {
                                         eY.innerText = eYInput.value;
                                         eYInput.replaceWith(eY);
                                         el.y = parseInt(eYInput.value);
-                                        drawBoard();
+                                        drawBoard(true, permissions.edit, permissions.editU);
                                     });
                                 });
                             }
@@ -251,7 +319,7 @@ $(document).ready(function() {
                             ev.preventDefault();
                             var targetElement = ev.target.closest('.li-categories');
                             elements.find((el) => { return el.id == draggedElement.id.slice(10); }).categoryId = parseInt(targetElement.id.slice(11));
-                            drawBoard();
+                            drawBoard(true, permissions.edit, permissions.editU);
                         });
                         li.addEventListener('dragover', (ev) => {
                             ev.preventDefault();
@@ -259,13 +327,12 @@ $(document).ready(function() {
                     });
                 }
             }
-
             if(!permissions.edit){
-                drawBoard(false, false);
+                drawBoard(false, permissions.edit, permissions.editU);
             }
             else{
                 function updateInDB(){
-                    $('#update').load('handlers/update.php', { 
+                    $('#update').load('handlers/update_board.php', { 
                         elements: elements,
                         categories: categories
                     }, 
@@ -300,10 +367,10 @@ $(document).ready(function() {
                         selectedElement.x = newMouseX - deltaX;
                         selectedElement.y = newMouseY - deltaY;
     
-                        drawBoard(false);
+                        drawBoard(false, permissions.edit, permissions.editU);
                     }
                 }
-                function handleMouseUp() { selectedElement = null; drawBoard(); }
+                function handleMouseUp() { selectedElement = null; drawBoard(true, permissions.edit, permissions.editU);; }
     
                 function handleClick(event) {
                     const rect = board.ref.getBoundingClientRect();
@@ -354,7 +421,7 @@ $(document).ready(function() {
                             textInput.style.width = e.width - 30 + 'px';
                             textInput.style.height = e.height - 30 + 'px';
     
-                            drawBoard(false);
+                            drawBoard(false, permissions.edit, permissions.editU);
                             board.ctx.fillStyle = `#${e.bgColor}`;
                             board.ctx.beginPath();
                             board.ctx.rect(e.x, e.y, e.width, e.height);
@@ -364,7 +431,7 @@ $(document).ready(function() {
                         textInput.addEventListener('blur', () => {
                             e.text = textInput.value;
                             board.ref.parentNode.removeChild(textInput);
-                            drawBoard();
+                            drawBoard(true, permissions.edit, permissions.editU);
                         });
                     
                         break;
@@ -377,7 +444,7 @@ $(document).ready(function() {
                 board.ref.addEventListener('mouseup', handleMouseUp);
                 board.ref.addEventListener('click', handleClick);
     
-                drawBoard(false);
+                drawBoard(false, permissions.edit, permissions.editU);
             }
         });
     }

@@ -2,6 +2,7 @@
 session_start();
 if(isset($_POST['logout'])){
     session_destroy();
+    header('Location: index.php');
 }else{
     if(!isset($_POST['login']) || !isset($_POST['pass'])){
         header('Location: index.php');
