@@ -6,27 +6,34 @@ if(!isset($_SESSION["name"])){
 }else{
     if(isset($_POST['delete-user'])){
 
-        include '../src/cfg/conn.php';
+        if(is_numeric($_POST['delete-user'])){
 
-        $sql = "DELETE FROM `userboard` WHERE `userboard`.`id_user` = ".$_POST['delete-user']."";
-    
-        $res = @mysqli_query($conn, $sql);
+            include '../src/cfg/conn.php';
 
-        mysqli_close($conn);
+            $sql = "DELETE FROM `userboard` WHERE `userboard`.`id_user` = ".$_POST['delete-user']."";
+        
+            $res = @mysqli_query($conn, $sql);
+
+            mysqli_close($conn);
+
+        }
 
         header('Location: ../login/index.php');
     }else{
         if(!isset($_POST["users"])){
             header('Location: ../login/index.php');
         }else{
-    
-            include '../src/cfg/conn.php';
-    
-            $sql = "UPDATE userboard SET edit = '".$_POST['users']['edit']."', add_users = '".$_POST['users']['addUsers']."', edit_users = '".$_POST['users']['editUsers']."', kick_users = '".$_POST['users']['kickUsers']."' WHERE id_user = ".$_POST['users']['id']." and owner = 0;";
+
+            if(is_numeric($_POST['users']['edit']) && is_numeric($_POST['users']['addUsers']) && is_numeric($_POST['users']['editUsers']) && is_numeric($_POST['users']['kickUsers']) && is_numeric($_POST['users']['id'])){
+
+                include '../src/cfg/conn.php';
         
-            $res = @mysqli_query($conn, $sql);
-    
-            mysqli_close($conn);
+                $sql = "UPDATE userboard SET edit = '".$_POST['users']['edit']."', add_users = '".$_POST['users']['addUsers']."', edit_users = '".$_POST['users']['editUsers']."', kick_users = '".$_POST['users']['kickUsers']."' WHERE id_user = ".$_POST['users']['id']." and owner = 0;";
+            
+                $res = @mysqli_query($conn, $sql);
+        
+                mysqli_close($conn);
+            }
         }
     }
 }

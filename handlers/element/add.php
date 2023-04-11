@@ -7,14 +7,17 @@ if(!isset($_SESSION["name"])){
     if(!$_SESSION['edit']){
         header('Location: ../../index.php?board='.$_SESSION['board']);
     }else{
+        if(is_numeric($_GET["id"])){
 
-        include '../../src/cfg/conn.php';
+            include '../../src/cfg/conn.php';
 
-        $sql = "INSERT INTO `element` (`id_element`, `id_board`, `id_user`, `text`, `bg_color`, `text_color`, `id_category`, `x`, `y`) VALUES (NULL, '".$_SESSION['board']."', '".$_SESSION['id_user']."', 'text', '000000', 'ffffff', '".$_GET['id']."', '0', '0');";
+            $sql = "INSERT INTO `element` (`id_element`, `id_board`, `id_user`, `text`, `bg_color`, `text_color`, `id_category`, `x`, `y`) VALUES (NULL, '".$_SESSION['board']."', '".$_SESSION['id_user']."', 'text', '000000', 'ffffff', '".$_GET['id']."', '0', '0');";
 
-        $res = @mysqli_query($conn, $sql);
+            $res = @mysqli_query($conn, $sql);
 
-        mysqli_close($conn);
+            mysqli_close($conn);
+            
+        }
 
         header('Location: ../../index.php?board='.$_SESSION['board']);
     }

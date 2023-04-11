@@ -7,14 +7,17 @@ if(!isset($_SESSION["name"])){
     if(!$_SESSION['edit']){
         header('Location: ../../index.php?board='.$_SESSION['board']);
     }else{
+        if(is_numeric($_GET["id"])){
 
-        include '../../src/cfg/conn.php';
+            include '../../src/cfg/conn.php';
 
-        $sql = "DELETE FROM `category` WHERE `category`.`id_category` = ".$_GET['id'];
+            $sql = "DELETE FROM `category` WHERE `category`.`id_category` = ".$_GET['id'];
 
-        $res = @mysqli_query($conn, $sql);
+            $res = @mysqli_query($conn, $sql);
 
-        mysqli_close($conn);
+            mysqli_close($conn);
+
+        }
 
         header('Location: ../../index.php?board='.$_SESSION['board']);
     }
