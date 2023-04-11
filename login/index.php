@@ -9,7 +9,7 @@ session_start();
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Log in</title>
 </head>
 <body>
 
@@ -22,11 +22,13 @@ if(isset($_SESSION["name"])){
         <!-- <input type="text" name="login" id="login" placeholder="login" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+"> -->
         <input type="text" name="login" id="login" placeholder="login" required maxlength="32" pattern="[a-zA-Z0-9]+">
         <br>
-        <!-- <input type="text" name="pass" id="pass" placeholder="haslo" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+"> -->
-        <input type="text" name="pass" id="pass" placeholder="haslo" required maxlength="32" pattern="[a-zA-Z0-9]+">
+        <!-- <input type="text" name="pass" id="pass" placeholder="password" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+"> -->
+        <input type="text" name="pass" id="pass" placeholder="password" required maxlength="32" pattern="[a-zA-Z0-9]+">
         <br>
-        <button type="submit">Zaloguj</button>
+        <button type="submit">Log in</button>
     </form>
+    Don't have an account
+    <a href="registration.php">Creat Account</a>
     <?php
 }
 ?>

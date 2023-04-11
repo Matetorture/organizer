@@ -29,7 +29,7 @@ $(document).ready(function() {
               
 
             class Element {
-                constructor(id, text, bgColor, textColor, x, y, categoryId){
+                constructor(id, text, bgColor, textColor, x, y, categoryId, layer){
                     this.id = id;
                     this.text = text;
                     this.bgColor = bgColor;
@@ -39,13 +39,15 @@ $(document).ready(function() {
                     this.categoryId = categoryId;
                     this.width = (13*this.text.length)+40;
                     this.height = 70;
+                    this.layer = layer;
                 }
             }
             class Category {
-                constructor(id, name, color){
+                constructor(id, name, color, layer){
                     this.id = id;
                     this.name = name;
                     this.color = color;
+                    this.layer = layer;
                 }
             }
 
@@ -61,7 +63,8 @@ $(document).ready(function() {
                         document.querySelector(`meta[name="textColor${i}"]`).content,
                         parseInt(document.querySelector(`meta[name="x${i}"]`).content),
                         parseInt(document.querySelector(`meta[name="y${i}"]`).content),
-                        parseInt(document.querySelector(`meta[name="idc${i}"]`).content)
+                        parseInt(document.querySelector(`meta[name="idc${i}"]`).content),
+                        parseInt(document.querySelector(`meta[name="layer${i}"]`).content)
                     )
                 );
             }
@@ -75,6 +78,7 @@ $(document).ready(function() {
                         parseInt(document.querySelector(`meta[name="cid${i}"]`).content),
                         document.querySelector(`meta[name="cname${i}"]`).content,
                         document.querySelector(`meta[name="ccolor${i}"]`).content,
+                        parseInt(document.querySelector(`meta[name="clayer${i}"]`).content)
                     )
                 );
             }
@@ -94,7 +98,7 @@ $(document).ready(function() {
                 board.ctx.fillStyle = "#131313";
                 board.ctx.fillRect(0, 0, board.width, board.height);
 
-                elements.forEach((e) => {
+                elements.slice().reverse().forEach((e) => {
 
                     e.width = (13*e.text.length)+40;
                     e.height = 70;
@@ -121,7 +125,7 @@ $(document).ready(function() {
                     drawElementsList(editable, admin);
                 }
             }
-
+            
             function drawElementsList(editable = true, admin = true){
 
                 const list = document.querySelector('#left-panel');
@@ -135,10 +139,10 @@ $(document).ready(function() {
 
                 returnList += `<ul>`;
                 categories.forEach((e) => {
-                    returnList += `<li class="li-categories" id="li-category${e.id}"><span id="ctext${e.id}">${e.name}</span><span class="attributes"><input type="color" name="cColor${e.id}" id="cColor${e.id}" value="#${e.color}"><form action="handlers/category/delete.php" method="get"><button class="deleteCategory" name="id" value="${e.id}" type="submit">D</button></form></span><ul>`;
+                    returnList += `<li class="li-categories" id="li-category${e.id}"> <input class="layers" type="number" id="clayer${e.id}" value="${e.layer}"> <span id="ctext${e.id}">${e.name}</span><span class="attributes"><input type="color" name="cColor${e.id}" id="cColor${e.id}" value="#${e.color}"><form action="handlers/category/delete.php" method="get"><button class="deleteCategory" name="id" value="${e.id}" type="submit">D</button></form></span><ul>`;
                     elements.forEach((el) => {
                         if(e.id == el.categoryId){
-                            returnList += `<li class="li-elements" draggable="true" id="li-element${el.id}"><span id="etext${el.id}">${el.text}</span><span class="attributes"><span id="ex${el.id}">${el.x}</span> <span id="ey${el.id}">${el.y}</span> <input type="color" name="bgColor${el.id}" id="bgColor${el.id}" value="#${el.bgColor}"><input type="color" name="textColor${el.id}" id="textColor${el.id}" value="#${el.textColor}"><form action="handlers/element/delete.php" method="get"><button class="deleteElement" name="id" value="${el.id}" type="submit">D</button></form></span></li>`;
+                            returnList += `<li class="li-elements" draggable="true" id="li-element${el.id}"> <input class="layers" type="number" id="elayer${el.id}" value="${el.layer}"> <span id="etext${el.id}">${el.text}</span><span class="attributes"> <span id="ex${el.id}">${el.x}</span> <span id="ey${el.id}">${el.y}</span> <input type="color" name="bgColor${el.id}" id="bgColor${el.id}" value="#${el.bgColor}"><input type="color" name="textColor${el.id}" id="textColor${el.id}" value="#${el.textColor}"><form action="handlers/element/delete.php" method="get"><button class="deleteElement" name="id" value="${el.id}" type="submit">D</button></form></span></li>`;
                         }
                     });
 
@@ -148,6 +152,11 @@ $(document).ready(function() {
                 });
                 returnList += `</ul></div>`;
                 list.innerHTML = returnList;
+
+                const layers = document.querySelectorAll('.layers');
+                layers.forEach((e) => {
+                    e.style.width = `${ 8*String(e.value).length+16 }px`;
+                });
 
                 if(admin){
                     const userList = document.querySelectorAll('#users-list-list li span:last-child');
@@ -230,6 +239,12 @@ $(document).ready(function() {
                                 drawBoard(true, permissions.edit, permissions.editU);
                             });
                         });
+
+                        const cLayer = document.querySelector(`#clayer${e.id}`);
+                        cLayer.addEventListener('blur', () => {
+                            e.layer = cLayer.value;
+                            drawBoard(true, permissions.edit, permissions.editU);
+                        });
     
     
                         elements.forEach((el) => {
@@ -300,6 +315,12 @@ $(document).ready(function() {
                                         el.y = parseInt(eYInput.value);
                                         drawBoard(true, permissions.edit, permissions.editU);
                                     });
+                                });
+
+                                const eLayer = document.querySelector(`#elayer${el.id}`);
+                                eLayer.addEventListener('blur', () => {
+                                    el.layer = eLayer.value;
+                                    drawBoard(true, permissions.edit, permissions.editU);
                                 });
                             }
                         });

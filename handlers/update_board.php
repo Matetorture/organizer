@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 if(!isset($_SESSION["name"])){
     header('Location: ../login/index.php');
@@ -11,13 +10,12 @@ if(!isset($_SESSION["name"])){
         $is_safely = true;
 
         foreach($_POST['elements'] as $e){
-            if(!preg_match ("/^[A-Z0-9]+/i", $e['text']) || !is_numeric($e['bgColor']) || !is_numeric($e['textColor']) || !is_numeric($e['categoryId']) || !is_numeric($e['x']) || !is_numeric($e['y']) || !is_numeric($e['id'])){
+            if(!preg_match ("/^[A-Z0-9]+/i", $e['text']) || !preg_match ("/^[A-Z0-9]+/i", $e['bgColor']) || !preg_match ("/^[A-Z0-9]+/i", $e['textColor']) || !is_numeric($e['categoryId']) || !is_numeric($e['x']) || !is_numeric($e['y']) || !is_numeric($e['id']) || !is_numeric($e['layer'])){
                 $is_safely = false;
             }
         }
         foreach($_POST['categories'] as $e){
-
-            if(!preg_match ("/^[A-Z0-9]+/i", $e['name']) || !is_numeric($e['color']) || !is_numeric($e['id'])){
+            if(!preg_match ("/^[A-Z0-9]+/i", $e['name']) || !preg_match ("/^[A-Z0-9]+/i", $e['color']) || !is_numeric($e['id']) || !is_numeric($e['layer'])){
                 $is_safely = false;
             }
         }
@@ -28,13 +26,13 @@ if(!isset($_SESSION["name"])){
             
             foreach($_POST['elements'] as $e){
             
-                $sql = "UPDATE element SET text = '".$e['text']."', bg_color = '".$e['bgColor']."', text_color = '".$e['textColor']."', id_category=".$e['categoryId'].",  x='".$e['x']."', y='".$e['y']."' WHERE id_element = ".$e['id'].";";
+                $sql = "UPDATE element SET text = '".$e['text']."', bg_color = '".$e['bgColor']."', text_color = '".$e['textColor']."', id_category=".$e['categoryId'].",  x='".$e['x']."', y='".$e['y']."', layer = '".$e['layer']."' WHERE id_element = ".$e['id'].";";
             
                 $res = @mysqli_query($conn, $sql);
             }
             foreach($_POST['categories'] as $e){
             
-                $sql = "UPDATE category SET name = '".$e['name']."', color = '".$e['color']."' WHERE id_category = ".$e['id'].";";
+                $sql = "UPDATE category SET name = '".$e['name']."', color = '".$e['color']."', layer = '".$e['layer']."' WHERE id_category = ".$e['id'].";";
             
                 $res = @mysqli_query($conn, $sql);
             }

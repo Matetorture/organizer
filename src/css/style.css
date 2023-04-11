@@ -10,14 +10,14 @@ body{
     /* margin: 0; */
 }
 #board{
-    width: 80vw;
+    width: 70vw;
     height: 85vh;
 }
 #content{
     display: flex;
 }
 #left-panel{
-    width: 20%;
+    width: 30%;
 }
 #elements-list{
     overflow-y: scroll;
@@ -71,4 +71,7 @@ form{
 }
 #users-list-list:first-child{
     list-style: none;
+}
+.layers{
+    width: 30px;
 }

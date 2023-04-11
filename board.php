@@ -19,7 +19,7 @@ $row = $res->fetch_assoc()
 
 <?php
 
-$sql = "SELECT element.id_element, element.text, element.bg_color, element.text_color, element.x, element.y, element.id_category FROM element WHERE element.id_board='".$_SESSION['board']."'";
+$sql = "SELECT element.id_element, element.text, element.bg_color, element.text_color, element.x, element.y, element.id_category, element.layer FROM element, category WHERE element.id_board='".$_SESSION['board']."' and element.id_category = category.id_category ORDER BY category.layer DESC, category.name, element.layer DESC, element.text";
 
 $res = @mysqli_query($conn, $sql);
 
@@ -35,13 +35,14 @@ while ($row = $res->fetch_assoc()){
     echo '<meta name="x'.$i.'" content="'.$row['x'].'">';
     echo '<meta name="y'.$i.'" content="'.$row['y'].'">';
     echo '<meta name="idc'.$i.'" content="'.$row['id_category'].'">';
+    echo '<meta name="layer'.$i.'" content="'.$row['layer'].'">';
     $i++;
 }
 
 mysqli_free_result($res);
 
 
-$sql = "SELECT DISTINCT category.id_category, category.name, category.color FROM category WHERE category.id_board='".$_SESSION['board']."'";
+$sql = "SELECT DISTINCT category.id_category, category.name, category.color, category.layer FROM category WHERE category.id_board='".$_SESSION['board']."' ORDER BY category.layer DESC, category.name";
 
 $res = @mysqli_query($conn, $sql);
 
@@ -53,6 +54,7 @@ while ($row = $res->fetch_assoc()){
     echo '<meta name="cid'.$i.'" content="'.$row['id_category'].'">';
     echo '<meta name="cname'.$i.'" content="'.$row['name'].'">';
     echo '<meta name="ccolor'.$i.'" content="'.$row['color'].'">';
+    echo '<meta name="clayer'.$i.'" content="'.$row['layer'].'">';
     $i++;
 }
 
@@ -64,7 +66,7 @@ echo '<meta name="addusers" content="'.$_SESSION['add_users'].'">';
 echo '<meta name="editusers" content="'.$_SESSION['edit_users'].'">';
 echo '<meta name="kickusers" content="'.$_SESSION['kick_users'].'">';
 
-$sql = "SELECT user.id_user, user.name, userboard.owner, userboard.edit, userboard.add_users, userboard.edit_users, userboard.kick_users FROM user, userboard WHERE user.id_user = userboard.id_user and userboard.id_board='".$_SESSION['board']."'";
+$sql = "SELECT user.id_user, user.name, userboard.owner, userboard.edit, userboard.add_users, userboard.edit_users, userboard.kick_users FROM user, userboard WHERE user.id_user = userboard.id_user and userboard.id_board='".$_SESSION['board']."' ORDER BY userboard.owner DESC, userboard.kick_users DESC, userboard.edit_users DESC, userboard.add_users DESC, userboard.edit DESC,  user.name";
 
 $res = @mysqli_query($conn, $sql);
 
@@ -87,7 +89,7 @@ $res = @mysqli_query($conn, $sql);
         while ($row = $res->fetch_assoc()){
             ?>
             <li>
-                <span class="users-list-users"><?php echo $row['name'].$row['owner']; ?></span>
+                <span class="users-list-users"><?php echo $row['name']." is owner ".$row['owner']; ?></span>
                 <span class="users-list-permission">
                     <input type="checkbox" name="edit<?php echo $row['id_user'] ?>"
                     <?php
@@ -144,7 +146,7 @@ $res = @mysqli_query($conn, $sql);
             $i++;
         }
         if($_SESSION['add_users']){
-            echo '<button id="addUser">Add User</button>';
+            echo '<form action="handlers/update_users.php" method="post"><input type="text" name="name" placeholder="user name"><button id="addUser"  name="add-user">Add User</button></form>';
         }
         echo '</ul>';
         mysqli_free_result($res);

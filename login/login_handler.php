@@ -13,7 +13,7 @@ if(isset($_POST['logout'])){
 
             include '../src/cfg/conn.php';
             
-            $sql = "SELECT id_user, login, pass, name FROM user WHERE login='".$_POST['login']."' and pass='".$_POST['pass']."'";
+            $sql = "SELECT id_user, login, name FROM user WHERE (login='".$_POST['login']."' or name='".$_POST['login']."') and pass='".$_POST['pass']."'";
             
             $res = @mysqli_query($conn, $sql);
             
