@@ -1,3 +1,4 @@
+<a href="index.php" id="list-link">ORGANIZER</a>
 <?php
 
 session_start();
@@ -7,15 +8,16 @@ if(!isset($_SESSION["name"])){
 
 include 'src/cfg/conn.php';
 
-$sql = "SELECT board.name, board.date FROM board, userboard WHERE userboard.id_board = board.id_board and userboard.id_board='".$_SESSION['board']."'";
+$sql = "SELECT board.name, board.bg, board.date FROM board, userboard WHERE userboard.id_board = board.id_board and userboard.id_board='".$_SESSION['board']."'";
 
 $res = @mysqli_query($conn, $sql);
 
-$row = $res->fetch_assoc()
+$row = $res->fetch_assoc();
+$boardBg = $row['bg'];
 
 ?>
 
-<p id="board-name"><?php echo $row['name']."  -  ".$row['date']; ?></p>
+<span id="board-name"><?php echo $row['name']."  -  ".$row['date']; ?></span>
 
 <?php
 
@@ -71,12 +73,26 @@ $sql = "SELECT user.id_user, user.name, userboard.owner, userboard.edit, userboa
 $res = @mysqli_query($conn, $sql);
 
 ?>
+<input type="color" name="boardBg" id="boardBg" value="#<?php echo $boardBg; ?>">
+
+<?php
+if(true){
+?>
+
+<img src="src/svg/save.svg" alt="save" id="save">
+
+<?php
+}
+?>
+
+<br><br>
+
 <div id="content">
     <canvas id="board"></canvas>
     <div id="left-panel"></div>
     <div id="users-list-bg"></div>
     <div id="users-list">
-        <div id="close-user-list">X</div>
+        <div id="close-user-list"><img src="src/svg/close.svg" alt="close" width="100%" height="100%"></div>
         <?php 
         $i = 0;
         echo '<ul id="users-list-list">';
@@ -89,7 +105,13 @@ $res = @mysqli_query($conn, $sql);
         while ($row = $res->fetch_assoc()){
             ?>
             <li>
-                <span class="users-list-users"><?php echo $row['name']." is owner ".$row['owner']; ?></span>
+                <span class="users-list-users"
+                <?php
+                if($row['owner']){
+                    echo ' style="color: var(--primary-color);" ';
+                }
+                ?>
+                ><?php echo $row['name'] ?></span>
                 <span class="users-list-permission">
                     <input type="checkbox" name="edit<?php echo $row['id_user'] ?>"
                     <?php
@@ -135,7 +157,7 @@ $res = @mysqli_query($conn, $sql);
                     if($_SESSION['kick_users']){
                     ?>
                     <form action="handlers/update_users.php" method="post">
-                        <button type="submit" name="delete-user" value="<?php echo $row['id_user'] ?>">D</button>
+                        <button type="submit" name="delete-user" value="<?php echo $row['id_user'] ?>" style="border: none; padding: 0; margin: 0;"><img src="src/svg/delete.svg" alt="delete" width="24px" height="24px"></button>
                     </form>
                     <?php
                     }
@@ -146,7 +168,7 @@ $res = @mysqli_query($conn, $sql);
             $i++;
         }
         if($_SESSION['add_users']){
-            echo '<form action="handlers/update_users.php" method="post"><input type="text" name="name" placeholder="user name"><button id="addUser"  name="add-user">Add User</button></form>';
+            echo '<br><form action="handlers/update_users.php" method="post"><input type="text" name="name" placeholder="user name"><button id="addUser"  name="add-user">Add User</button></form>';
         }
         echo '</ul>';
         mysqli_free_result($res);

@@ -7,17 +7,14 @@ if(!isset($_SESSION["name"])){
     if(!$_SESSION['edit']){
         header('Location: ../../index.php?board='.$_SESSION['board']);
     }else{
-        if(is_numeric($_GET["id"])){
 
-            include '../../src/cfg/conn.php';
-            
-            $sql = "INSERT INTO `category` (`id_category`, `id_board`, `id_user`, `name`, `color`) VALUES (NULL, '".$_SESSION['board']."', '".$_SESSION['id_user']."', 'name', '000000')";
-            
-            $res = @mysqli_query($conn, $sql);
-            
-            mysqli_close($conn);
-            
-        }
+        include '../../src/cfg/conn.php';
+        
+        $sql = "INSERT INTO `category` (`id_category`, `id_board`, `id_user`, `name`, `color`, `layer`) VALUES (NULL, '".$_SESSION['board']."', '".$_SESSION['id_user']."', 'name', '000000', '0')";
+        
+        $res = @mysqli_query($conn, $sql);
+        
+        mysqli_close($conn);
         
         header('Location: ../../index.php?board='.$_SESSION['board']);
     }

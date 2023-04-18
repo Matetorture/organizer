@@ -54,14 +54,13 @@ if(isset($_GET["board"])){
     <script src="src/js/app.js"></script>
 </head>
 <body>
-    <a href="index.php" id="list">list</a>
     <div id="main">
         <div id="app"></div>
         <div id="update"></div>
     </div>
 
-    <form action="login/login_handler.php" method="post">
-        <input type="submit" value="logout" name="logout">
+    <form action="login/login_handler.php" method="post" id="logout-form">
+        <input type="submit" value="logout" name="logout" id="logout">
     </form>
 </body>
 </html>

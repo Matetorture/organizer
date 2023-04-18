@@ -3,11 +3,15 @@ session_start();
 if(!isset($_SESSION["name"])){
     header('Location: ../login/index.php');
 }else{
-    if(!isset($_POST["elements"]) || !isset($_POST["categories"])){
+    if(!isset($_POST["elements"]) || !isset($_POST["categories"]) || !isset($_POST["boardBg"])){
         header('Location: ../login/index.php');
     }else{
 
         $is_safely = true;
+
+        if(!preg_match ("/^[A-Z0-9]+/i", $_POST['boardBg'])){
+            $is_safely = false;
+        }
 
         foreach($_POST['elements'] as $e){
             if(!preg_match ("/^[A-Z0-9]+/i", $e['text']) || !preg_match ("/^[A-Z0-9]+/i", $e['bgColor']) || !preg_match ("/^[A-Z0-9]+/i", $e['textColor']) || !is_numeric($e['categoryId']) || !is_numeric($e['x']) || !is_numeric($e['y']) || !is_numeric($e['id']) || !is_numeric($e['layer'])){
@@ -23,6 +27,10 @@ if(!isset($_SESSION["name"])){
         if($is_safely){
             
             include '../src/cfg/conn.php';
+
+            $sql = "UPDATE board SET bg = '".$_POST['boardBg']."' WHERE id_board = ".$_SESSION['board'].";";
+            
+            $res = @mysqli_query($conn, $sql);
             
             foreach($_POST['elements'] as $e){
             

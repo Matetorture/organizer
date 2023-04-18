@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 :root{
     --main-color: #3d3d3d;
+    --primary-color: #98ff98;
     --text-color: #d3d3d3;
 }
 body{
@@ -52,12 +53,12 @@ form{
     background-color: var(--main-color);
     width: 40vw;
     height: 70vh;
+    overflow-y: scroll;
 }
 #close-user-list{
     position: fixed;
     top: 15vh;
     right: 30vw;
-    background-color: red;
     margin: 15px;
     width: 30px;
     height: 30px;
@@ -74,4 +75,113 @@ form{
 }
 .layers{
     width: 30px;
+}
+
+input{
+    background-color: transparent;
+    border: none;
+    border-bottom: var(--primary-color) solid 2px;
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+}
+input[type=color]{
+    border: none;
+}
+input:focus{
+    outline: none;
+}
+input[type="number"] {
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+#logout {
+    font-size: large;
+    height: 40px;
+    border: var(--primary-color) solid 2px;
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+}
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+}
+button{
+    padding: 10px;
+    margin: 0 5px;
+    border: var(--primary-color) solid 2px;
+    box-shadow: 2px 1px 1px #3d3d3d;
+    background-color: var(--main-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+}
+.attributes button{
+    padding: 2px;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+}
+
+#logout-form{
+    padding: 0;
+    background-color: var(--main-color);
+    position: fixed;
+    left: 30px;
+    bottom: 30px;
+}
+#list-link{
+    color: var(--primary-color);
+    font-size: xx-large;
+    text-decoration: none;
+}
+.login-switch-link{
+    color: var(--primary-color);
+    text-decoration: none;
+}
+.login-form{
+    margin-top: 30vh;
+    text-align: center;
+}
+.login-form input{
+    font-size: x-large;
+    height: 40px;
+}
+.login-form{
+    font-size: x-large;
+}
+.login-form button{
+    font-size: x-large;
+    height: 50px;
+}
+
+#board-list-list button{
+    font-size: large;
+    height: 40px;
+}
+#board-list-list input{
+    font-size: large;
+    height: 30px;
+}
+#board-list-list{
+    margin-top: 20px;
+    text-align: center;
+}
+
+::-webkit-scrollbar {
+    width: 13px;
+}
+::-webkit-scrollbar-track {
+    background: var(--main-color);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+#save{
+    float: right;
+    width: 48px;
+    height: 48px;
 }

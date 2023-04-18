@@ -11,7 +11,8 @@ $(document).ready(function() {
                 ref: document.querySelector("#board"),
                 ctx: document.querySelector("#board").getContext("2d"),
                 width: document.querySelector("#board").offsetWidth,
-                height: document.querySelector("#board").offsetHeight
+                height: document.querySelector("#board").offsetHeight,
+                bg: document.querySelector('#boardBg').value.slice(1)
             };
 
             board.ctx.canvas.height = board.height;
@@ -95,7 +96,7 @@ $(document).ready(function() {
 
                 board.ctx.clearRect(0, 0, board.ref.width, board.ref.height);
 
-                board.ctx.fillStyle = "#131313";
+                board.ctx.fillStyle = `#${board.bg}`;
                 board.ctx.fillRect(0, 0, board.width, board.height);
 
                 elements.slice().reverse().forEach((e) => {
@@ -139,10 +140,10 @@ $(document).ready(function() {
 
                 returnList += `<ul>`;
                 categories.forEach((e) => {
-                    returnList += `<li class="li-categories" id="li-category${e.id}"> <input class="layers" type="number" id="clayer${e.id}" value="${e.layer}"> <span id="ctext${e.id}">${e.name}</span><span class="attributes"><input type="color" name="cColor${e.id}" id="cColor${e.id}" value="#${e.color}"><form action="handlers/category/delete.php" method="get"><button class="deleteCategory" name="id" value="${e.id}" type="submit">D</button></form></span><ul>`;
+                    returnList += `<li class="li-categories" id="li-category${e.id}"> <input class="layers" type="number" id="clayer${e.id}" value="${e.layer}"> <span id="ctext${e.id}">${e.name}</span><span class="attributes"><input type="color" name="cColor${e.id}" id="cColor${e.id}" value="#${e.color}"><form action="handlers/category/delete.php" method="get"><button class="deleteCategory" name="id" value="${e.id}" type="submit"><img src="src/svg/delete.svg" alt="delete" width="24px" height="24px" style="border: none; padding: 0; margin: 0;"></button></form></span><ul>`;
                     elements.forEach((el) => {
                         if(e.id == el.categoryId){
-                            returnList += `<li class="li-elements" draggable="true" id="li-element${el.id}"> <input class="layers" type="number" id="elayer${el.id}" value="${el.layer}"> <span id="etext${el.id}">${el.text}</span><span class="attributes"> <span id="ex${el.id}">${el.x}</span> <span id="ey${el.id}">${el.y}</span> <input type="color" name="bgColor${el.id}" id="bgColor${el.id}" value="#${el.bgColor}"><input type="color" name="textColor${el.id}" id="textColor${el.id}" value="#${el.textColor}"><form action="handlers/element/delete.php" method="get"><button class="deleteElement" name="id" value="${el.id}" type="submit">D</button></form></span></li>`;
+                            returnList += `<li class="li-elements" draggable="true" id="li-element${el.id}"> <input class="layers" type="number" id="elayer${el.id}" value="${el.layer}"> <span id="etext${el.id}">${el.text}</span><span class="attributes"> <span id="ex${el.id}">${el.x}</span> <span id="ey${el.id}">${el.y}</span> <input type="color" name="bgColor${el.id}" id="bgColor${el.id}" value="#${el.bgColor}"><input type="color" name="textColor${el.id}" id="textColor${el.id}" value="#${el.textColor}"><form action="handlers/element/delete.php" method="get"><button class="deleteElement" name="id" value="${el.id}" type="submit"><img src="src/svg/delete.svg" alt="delete" width="24px" height="24px" style="border: none; padding: 0; margin: 0;"></button></form></span></li>`;
                         }
                     });
 
@@ -227,7 +228,7 @@ $(document).ready(function() {
                             const cTextInput = document.createElement('input');
                             cTextInput.type = 'text';
                             cTextInput.value = e.name;
-                            cTextInput.style.width = `${(7*e.name.length)+2}px`;
+                            cTextInput.style.width = `${(8*e.name.length)+2}px`;
     
                             cText.replaceWith(cTextInput);
                             cTextInput.focus();
@@ -266,7 +267,7 @@ $(document).ready(function() {
                                     const eTextInput = document.createElement('input');
                                     eTextInput.type = 'text';
                                     eTextInput.value = el.text;
-                                    eTextInput.style.width = `${(7*el.text.length)+4}px`;
+                                    eTextInput.style.width = `${(8*el.text.length)+4}px`;
                                     eText.replaceWith(eTextInput);
                                     eTextInput.focus();
 
@@ -355,7 +356,8 @@ $(document).ready(function() {
                 function updateInDB(){
                     $('#update').load('handlers/update_board.php', { 
                         elements: elements,
-                        categories: categories
+                        categories: categories,
+                        boardBg: board.bg
                     }, 
                     function(){
                         console.log('saved');
@@ -459,13 +461,25 @@ $(document).ready(function() {
                         }
                     }
                 }
+
+                const boardBg = document.querySelector('#boardBg');
+                boardBg.addEventListener('input', () => {
+                    board.bg = boardBg.value.slice(1);
+                    drawBoard(false, permissions.edit, permissions.editU);
+                });
+
+
+                const save = document.querySelector('#save');
+                save.addEventListener('click', () => {
+                    drawBoard(true, permissions.edit, permissions.editU);
+                });
     
                 board.ref.addEventListener('mousedown', handleMouseDown);
                 board.ref.addEventListener('mousemove', handleMouseMove);
                 board.ref.addEventListener('mouseup', handleMouseUp);
                 board.ref.addEventListener('click', handleClick);
     
-                drawBoard(false, permissions.edit, permissions.editU);
+                drawBoard(true, permissions.edit, permissions.editU);
             }
         });
     }
