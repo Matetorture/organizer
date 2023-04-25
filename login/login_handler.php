@@ -13,7 +13,7 @@ if(isset($_POST['logout'])){
 
             include '../src/cfg/conn.php';
             
-            $sql = "SELECT id_user, login, name FROM user WHERE (login='".$_POST['login']."' or name='".$_POST['login']."') and pass='".$_POST['pass']."'";
+            $sql = "SELECT id_user, login, name, pass FROM user WHERE login='".$_POST['login']."' or name='".$_POST['login']."'";
             
             $res = @mysqli_query($conn, $sql);
             
@@ -21,8 +21,10 @@ if(isset($_POST['logout'])){
             
             if($users>0){
                 $row = $res->fetch_assoc(); 
-                $_SESSION['name'] = $row['name'];
-                $_SESSION['id_user'] = $row['id_user'];
+                if(password_verify($_POST['pass'], $row['pass'])){
+                    $_SESSION['name'] = $row['name'];
+                    $_SESSION['id_user'] = $row['id_user'];
+                }
             }
             
             mysqli_free_result($res);

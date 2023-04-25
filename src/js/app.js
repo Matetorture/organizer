@@ -92,7 +92,7 @@ $(document).ready(function() {
                 kick:  document.querySelector(`meta[name="kickusers"]`).content == 1 ? true : false
             };
 
-            function drawBoard(save = true, editable = true, admin = true, list = true){
+            function drawBoard(save = true, editable = true, admin = true, list = true, whichU="all", elementsU=elements, categoriesU=categories){
 
                 board.ctx.clearRect(0, 0, board.ref.width, board.ref.height);
 
@@ -116,11 +116,11 @@ $(document).ready(function() {
     
                     board.ctx.fillStyle = `#${e.textColor}`;
                     board.ctx.textAlign = 'center';
-                    board.ctx.font = "24px 'Share Tech Mono', monospace";
+                    board.ctx.font = '24px "Share Tech Mono", monospace';
                     board.ctx.fillText(e.text, parseFloat(e.x)+e.width/2, parseFloat(e.y)+e.height/2+13/2);
                 });
                 if(save){
-                    updateInDB();
+                    updateInDB(elementsU, categoriesU, whichU);
                 }
                 if(list){
                     drawElementsList(editable, admin);
@@ -134,16 +134,24 @@ $(document).ready(function() {
 
                 returnList += '<form action="handlers/category/add.php" method="get"><button id="addCategory" type="submit">Add Category</button></form>';
                 if(admin){
-                    returnList += '<button id="showUsers">users</button>';
+                    returnList += '<button id="showUsers">USERS</button>';
                 }
                 returnList += '<div id="elements-list">';
 
                 returnList += `<ul>`;
                 categories.forEach((e) => {
-                    returnList += `<li class="li-categories" id="li-category${e.id}"> <input class="layers" type="number" id="clayer${e.id}" value="${e.layer}"> <span id="ctext${e.id}">${e.name}</span><span class="attributes"><input type="color" name="cColor${e.id}" id="cColor${e.id}" value="#${e.color}"><form action="handlers/category/delete.php" method="get"><button class="deleteCategory" name="id" value="${e.id}" type="submit"><img src="src/svg/delete.svg" alt="delete" width="24px" height="24px" style="border: none; padding: 0; margin: 0;"></button></form></span><ul>`;
+                    let newCategory = e.name.substring(0, 40);
+                            if(newCategory != e.name){
+                                newCategory+='...';
+                            }
+                    returnList += `<li class="li-categories" id="li-category${e.id}"> <input class="layers" type="number" id="clayer${e.id}" value="${e.layer}"> <span id="ctext${e.id}">${newCategory}</span><span class="attributes"><input type="color" name="cColor${e.id}" id="cColor${e.id}" value="#${e.color}"><form action="handlers/category/delete.php" method="get"><button class="deleteCategory" name="id" value="${e.id}" type="submit"><img src="src/svg/delete.svg" alt="delete" width="24px" height="24px" style="border: none; padding: 0; margin: 0;"></button></form></span><ul>`;
                     elements.forEach((el) => {
                         if(e.id == el.categoryId){
-                            returnList += `<li class="li-elements" draggable="true" id="li-element${el.id}"> <input class="layers" type="number" id="elayer${el.id}" value="${el.layer}"> <span id="etext${el.id}">${el.text}</span><span class="attributes"> <span id="ex${el.id}">${el.x}</span> <span id="ey${el.id}">${el.y}</span> <input type="color" name="bgColor${el.id}" id="bgColor${el.id}" value="#${el.bgColor}"><input type="color" name="textColor${el.id}" id="textColor${el.id}" value="#${el.textColor}"><form action="handlers/element/delete.php" method="get"><button class="deleteElement" name="id" value="${el.id}" type="submit"><img src="src/svg/delete.svg" alt="delete" width="24px" height="24px" style="border: none; padding: 0; margin: 0;"></button></form></span></li>`;
+                            let newText = el.text.substring(0, 20);
+                            if(newText != el.text){
+                                newText+='...';
+                            }
+                            returnList += `<li class="li-elements" draggable="true" id="li-element${el.id}"> <input class="layers" type="number" id="elayer${el.id}" value="${el.layer}"> <span id="etext${el.id}">${newText}</span><span class="attributes"> <span id="ex${el.id}">${el.x}</span> <span id="ey${el.id}">${el.y}</span> <input type="color" name="bgColor${el.id}" id="bgColor${el.id}" value="#${el.bgColor}"><input type="color" name="textColor${el.id}" id="textColor${el.id}" value="#${el.textColor}"><form action="handlers/element/delete.php" method="get"><button class="deleteElement" name="id" value="${el.id}" type="submit"><img src="src/svg/delete.svg" alt="delete" width="24px" height="24px" style="border: none; padding: 0; margin: 0;"></button></form></span></li>`;
                         }
                     });
 
@@ -156,7 +164,7 @@ $(document).ready(function() {
 
                 const layers = document.querySelectorAll('.layers');
                 layers.forEach((e) => {
-                    e.style.width = `${ 8*String(e.value).length+16 }px`;
+                    e.style.width = `${ 8*String(e.value).length }px`;
                 });
 
                 if(admin){
@@ -237,14 +245,14 @@ $(document).ready(function() {
                                 cText.innerText = cTextInput.value;
                                 cTextInput.replaceWith(cText);
                                 e.name = cTextInput.value;
-                                drawBoard(true, permissions.edit, permissions.editU);
+                                drawBoard(true, permissions.edit, permissions.editU, true, "category", '', e);
                             });
                         });
 
                         const cLayer = document.querySelector(`#clayer${e.id}`);
                         cLayer.addEventListener('blur', () => {
                             e.layer = cLayer.value;
-                            drawBoard(true, permissions.edit, permissions.editU);
+                            drawBoard(true, permissions.edit, permissions.editU,true, "category", '', e);
                         });
     
     
@@ -280,7 +288,7 @@ $(document).ready(function() {
                                         eText.innerText = eTextInput.value;
                                         eTextInput.replaceWith(eText);
                                         el.text = eTextInput.value;
-                                        drawBoard(true, permissions.edit, permissions.editU);
+                                        drawBoard(true, permissions.edit, permissions.editU, true, 'element', el, '');
                                     });
                                 });
     
@@ -297,7 +305,7 @@ $(document).ready(function() {
                                         eX.innerText = eXInput.value;
                                         eXInput.replaceWith(eX);
                                         el.x = parseInt(eXInput.value);
-                                        drawBoard(true, permissions.edit, permissions.editU);
+                                        drawBoard(true, permissions.edit, permissions.editU, true, 'element', el, '');
                                     });
                                 });
     
@@ -314,14 +322,14 @@ $(document).ready(function() {
                                         eY.innerText = eYInput.value;
                                         eYInput.replaceWith(eY);
                                         el.y = parseInt(eYInput.value);
-                                        drawBoard(true, permissions.edit, permissions.editU);
+                                        drawBoard(true, permissions.edit, permissions.editU), true, 'element', el, '';
                                     });
                                 });
 
                                 const eLayer = document.querySelector(`#elayer${el.id}`);
                                 eLayer.addEventListener('blur', () => {
                                     el.layer = eLayer.value;
-                                    drawBoard(true, permissions.edit, permissions.editU);
+                                    drawBoard(true, permissions.edit, permissions.editU, true, 'element', el, '');
                                 });
                             }
                         });
@@ -341,7 +349,7 @@ $(document).ready(function() {
                             ev.preventDefault();
                             var targetElement = ev.target.closest('.li-categories');
                             elements.find((el) => { return el.id == draggedElement.id.slice(10); }).categoryId = parseInt(targetElement.id.slice(11));
-                            drawBoard(true, permissions.edit, permissions.editU);
+                            drawBoard(true, permissions.edit, permissions.editU, true, 'element', el, '');
                         });
                         li.addEventListener('dragover', (ev) => {
                             ev.preventDefault();
@@ -353,14 +361,16 @@ $(document).ready(function() {
                 drawBoard(false, permissions.edit, permissions.editU);
             }
             else{
-                function updateInDB(){
+                function updateInDB(elementsUp, categoriesUp, whichUp="all"){
                     $('#update').load('handlers/update_board.php', { 
-                        elements: elements,
-                        categories: categories,
-                        boardBg: board.bg
+                        elements: elementsUp,
+                        categories: categoriesUp,
+                        boardBg: board.bg,
+                        which: whichUp,
+                        id: 0
                     }, 
                     function(){
-                        console.log('saved');
+                        console.log('saved board');
                     });
                 }
     
@@ -393,7 +403,10 @@ $(document).ready(function() {
                         drawBoard(false, permissions.edit, permissions.editU);
                     }
                 }
-                function handleMouseUp() { selectedElement = null; drawBoard(true, permissions.edit, permissions.editU);; }
+                function handleMouseUp() { 
+                    selectedElement = null; 
+                    drawBoard(true, permissions.edit, permissions.editU);
+                }
     
                 function handleClick(event) {
                     const rect = board.ref.getBoundingClientRect();
@@ -479,7 +492,7 @@ $(document).ready(function() {
                 board.ref.addEventListener('mouseup', handleMouseUp);
                 board.ref.addEventListener('click', handleClick);
     
-                drawBoard(true, permissions.edit, permissions.editU);
+                drawBoard(false, permissions.edit, permissions.editU);
             }
         });
     }

@@ -9,7 +9,7 @@ if(!isset($_SESSION["name"])){
     
             include '../../src/cfg/conn.php';
             
-            $sql = "INSERT INTO `board` (`id_board`, `name`, `date`) VALUES (NULL, '".$_GET['name']."', '".date("Y-m-d")."')";
+            $sql = "INSERT INTO `board` (`id_board`, `name`, `date`, `bg`) VALUES (NULL, '".$_GET['name']."', '".date("Y-m-d")."', '000000')";
             
             $res = @mysqli_query($conn, $sql);
 

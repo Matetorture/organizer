@@ -10,6 +10,13 @@ body{
     font-family: 'Share Tech Mono', monospace;
     /* margin: 0; */
 }
+button{
+    cursor: pointer;
+}
+input{
+    cursor: pointer;
+}
+
 #board{
     width: 70vw;
     height: 85vh;
@@ -56,6 +63,7 @@ form{
     overflow-y: scroll;
 }
 #close-user-list{
+    cursor: pointer;
     position: fixed;
     top: 15vh;
     right: 30vw;
@@ -184,4 +192,34 @@ button{
     float: right;
     width: 48px;
     height: 48px;
+    cursor: pointer;
+}
+.delete-board{
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+.delete-board img{
+    width: 24px;
+    height: 24px;
+}
+.edit-button{
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+.edit-button img{
+    width: 24px;
+    height: 24px;
+}
+
+.users-list-permission input{
+    margin-right: 60px;
+}
+.users-list-permission img{
+    margin-right: 15px;
+}
+
+.permission-other-color{
+    color: var(--primary-color);
 }

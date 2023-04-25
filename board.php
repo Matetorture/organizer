@@ -97,9 +97,9 @@ if(true){
         $i = 0;
         echo '<ul id="users-list-list">';
         ?>
-            <span class="users-list-users">users</span>
+            <span class="users-list-users">USERS</span>
             <span class="users-list-permission">
-                edit addU editU kickU
+                <span class="permission-other-color">Edit board</span> Add user <span class="permission-other-color">Edit user</span> Kick user <span class="permission-other-color">Delete</span>
             </span>
         <?php
         while ($row = $res->fetch_assoc()){

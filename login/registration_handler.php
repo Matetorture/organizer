@@ -9,8 +9,10 @@ if(!isset($_POST['login']) || !isset($_POST['pass']) || !isset($_POST['name'])){
     }else{
 
         include '../src/cfg/conn.php';
+
+        $pass = password_hash($_POST['pass'], PASSWORD_DEFAULT);
         
-        $sql = "INSERT INTO `user` (`id_user`, `name`, `email`, `login`, `pass`) VALUES (NULL, '".$_POST['name']."', '".$_POST['email']."', '".$_POST['login']."', '".$_POST['pass']."');";
+        $sql = "INSERT INTO `user` (`id_user`, `name`, `email`, `login`, `pass`) VALUES (NULL, '".$_POST['name']."', '".$_POST['email']."', '".$_POST['login']."', '".$pass."');";
         
         $res = @mysqli_query($conn, $sql);
         

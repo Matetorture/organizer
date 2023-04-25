@@ -21,20 +21,13 @@ if(isset($_SESSION["name"])){
     ?>
     <div class="login-form">
         <form action="registration_handler.php" method="post">
-            <!-- <input type="text" name="name" id="name" placeholder="name" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+">
+            <input type="text" name="name" id="name" placeholder="name" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+">
             <br>
             <input type="text" name="login" id="login" placeholder="login" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+">
             <br>
             <input type="text" name="pass" id="pass" placeholder="password" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+">
-            <br> -->
-    
-            <input type="text" name="name" id="name" placeholder="name" required pattern="[a-zA-Z0-9]+">
             <br>
-            <input type="text" name="login" id="login" placeholder="login" required  pattern="[a-zA-Z0-9]+">
-            <br>
-            <input type="text" name="pass" id="pass" placeholder="password" required pattern="[a-zA-Z0-9]+">
-            <br>
-            <input type="email" name="email" id="email" placeholder="email" required>
+            <input type="email" name="email" id="email" placeholder="email" required minlength="5" maxlength="32">
             <br>
             <br>
     
