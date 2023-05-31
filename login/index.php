@@ -23,15 +23,22 @@ if(isset($_SESSION["name"])){
         <form action="login_handler.php" method="post">
             <input type="text" name="login" id="login" placeholder="login" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+">
             <br>
-            <input type="text" name="pass" id="pass" placeholder="password" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+">
+            <input type="password" name="pass" id="pass" placeholder="password" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+">
+			<?php
+			if(isset($_GET['msg'])){
+				if(preg_match ("/^[A-Z0-9]+/i", $_GET['msg'])){
+					echo "<br><br>".$_GET['msg'];
+				}
+			}
+			?>
             <br>
             <br>
             <button type="submit">Log in</button>
         </form>
         <br>
         <br>
-        Don't have an account
-        <a href="registration.php" class="login-switch-link">Creat Account</a>
+        Don't have an account.
+        <a href="registration.php" class="login-switch-link">Create Account</a>
     </div>
     <?php
 }

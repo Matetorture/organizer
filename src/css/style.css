@@ -8,7 +8,6 @@ body{
     background-color: var(--main-color);
     color: var(--text-color);
     font-family: 'Share Tech Mono', monospace;
-    /* margin: 0; */
 }
 button{
     cursor: pointer;
@@ -26,6 +25,7 @@ input{
 }
 #left-panel{
     width: 30%;
+    min-width: 400px;
 }
 #elements-list{
     overflow-y: scroll;

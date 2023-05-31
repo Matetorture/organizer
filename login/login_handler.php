@@ -30,7 +30,7 @@ if(isset($_POST['logout'])){
             mysqli_free_result($res);
             mysqli_close($conn);
             
-            header('Location: index.php');
+            header('Location: index.php?msg=Wrong login/password');
         }
         
     }

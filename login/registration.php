@@ -25,17 +25,24 @@ if(isset($_SESSION["name"])){
             <br>
             <input type="text" name="login" id="login" placeholder="login" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+">
             <br>
-            <input type="text" name="pass" id="pass" placeholder="password" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+">
+            <input type="password" name="pass" id="pass" placeholder="password" required minlength="8" maxlength="32" pattern="[a-zA-Z0-9]+">
             <br>
             <input type="email" name="email" id="email" placeholder="email" required minlength="5" maxlength="32">
-            <br>
+            <?php
+			if(isset($_GET['msg'])){
+				if(preg_match ("/^[A-Z0-9]+/i", $_GET['msg'])){
+					echo "<br><br>".$_GET['msg'];
+				}
+			}
+			?>
+			<br>
             <br>
     
-            <button type="submit">Creat Account</button>
+            <button type="submit">Create Account</button>
         </form>
         <br>
         <br>
-        You already have an account
+        You already have an account.
         <a href="index.php" class="login-switch-link">Log in</a>
     </div>
     <?php

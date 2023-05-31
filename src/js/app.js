@@ -348,8 +348,9 @@ $(document).ready(function() {
                         li.addEventListener('drop', (ev) => {
                             ev.preventDefault();
                             var targetElement = ev.target.closest('.li-categories');
-                            elements.find((el) => { return el.id == draggedElement.id.slice(10); }).categoryId = parseInt(targetElement.id.slice(11));
-                            drawBoard(true, permissions.edit, permissions.editU, true, 'element', el, '');
+                            let ele = elements.find((el) => { return ( el.id == draggedElement.id.slice(10))});
+                            ele.categoryId = parseInt(targetElement.id.slice(11));
+                            drawBoard(true, permissions.edit, permissions.editU, true, 'element', ele, '');
                         });
                         li.addEventListener('dragover', (ev) => {
                             ev.preventDefault();

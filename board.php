@@ -1,4 +1,4 @@
-<a href="index.php" id="list-link">ORGANIZER</a>
+<a href="index.php" id="list-link">ORGANIZER LIST</a>
 <?php
 
 session_start();

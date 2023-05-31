@@ -10,7 +10,7 @@ if(!isset($_SESSION["name"])){
 
             include '../src/cfg/conn.php';
 
-            $sql = "DELETE FROM `userboard` WHERE `userboard`.`id_user` = ".$_POST['delete-user']."";
+            $sql = "DELETE FROM `userboard` WHERE `userboard`.`id_user` = ".$_POST['delete-user']." and `userboard`.`owner` = 0 ";
         
             $res = @mysqli_query($conn, $sql);
 
